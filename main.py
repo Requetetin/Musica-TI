@@ -4,7 +4,7 @@ import os
 from pytube import YouTube
 from moviepy.editor import VideoFileClip
 
-def process_video (input_movie, size=(2000,100)):
+def process_video (input_movie, title, size=(2000,100)):
     colours = []
     counter = 0
 
@@ -21,7 +21,7 @@ def process_video (input_movie, size=(2000,100)):
         colours.append(colours_frame)
     print('WWOOOOO')
     # Generates the final picture
-    generate_pic(colours, size)
+    generate_pic(colours, size, title)
 
 import numpy as np
 import colorsys
@@ -49,7 +49,7 @@ def resize_image (image, size=100):
     image = cv2.resize(image, (w_new, h_new));
     return image
 
-def generate_pic (colours, size):
+def generate_pic (colours, size, title):
     print('HERE')
     # Generates the picture
     height = size[1]
@@ -62,33 +62,38 @@ def generate_pic (colours, size):
 
     # Converts back to RGB
     img = cv2.cvtColor(img, cv2.COLOR_HSV2RGB)
-    cv2.imwrite("barcode_full.png", img)
+    cv2.imwrite(title + ".png", img)
 
 
 # Download the video
-url = 'https://www.youtube.com/watch?v=heWd9gPJABw'
+url = 'https://www.youtube.com/watch?v=GZLkZ03vYgk'
+title = 'EtG Speedrun Any (0635) [WR]'
 
 # Initialize a YouTube object
 yt = YouTube(url)
+print('CP1')
 
 # Choose the highest resolution stream
 video_stream = yt.streams.filter(file_extension='mp4').get_highest_resolution()
+print('CP2')
 
 # Download the video
 video_stream.download(output_path='VIDEO_TITLE')
+print('CP3')
 
 # Define the input and output file paths
-input_path = './VIDEO_TITLE/Cute Baby Animals Videos Compilation  Funny and Cute Moment of the Animals 1 - Cutest Animals 2023.mp4'
-output_path = './VIDEO_TITLE/VIDEO_TITLE_converted.mp4'
+input_path = './VIDEO_TITLE/' + title + '.mp4'
+output_path = './VIDEO_TITLE/download.mp4'
 
 # Load the video using moviepy
 video_clip = VideoFileClip(input_path)
 
-# Convert the video to MP4 format
+# # Convert the video to MP4 format
 video_clip.write_videofile(output_path, codec='libx264')
 
 print(f"Video downloaded and converted to {output_path}")
 
 # Process it
-process_video(output_path)
+process_video(output_path, title)
+print('CP4')
 #os.remove(output_path)
