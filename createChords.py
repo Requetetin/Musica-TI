@@ -86,7 +86,7 @@ def average_colors_in_segments(image_path):
 
         segment = img.crop((left, 0, right, 100))
 
-        non_black_pixels = [pixel for pixel in segment.getdata() if pixel != (0, 0, 0)]
+        non_black_pixels = [pixel for pixel in segment.getdata() if not(pixel[0] <= 45 and pixel[1] <= 45 and pixel[2] <= 45)]
 
         if non_black_pixels:
             avg_color = (
