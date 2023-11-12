@@ -13,6 +13,15 @@ def rgb_to_hue(rgb):
     hue = h * 360
     return hue
 
+def rgb_to_hsl(rgb):
+    r = rgb[0] / 255
+    g = rgb[1] / 255
+    b = rgb[2] / 255
+    
+    h, s, l = colorsys.rgb_to_hls(r, g, b)
+    
+    return round(h * 255), round(s * 255), round(l * 255)
+
 
 def get_scale(rgb_list):
     warm_count = 0
@@ -100,7 +109,90 @@ def average_colors_in_segments(image_path):
 
     return avg_colors
 
-image_path = os.path.join( 'Barcodes', 'Platformers', 'Celeste.png')
+def get_scale_notes(scale):
+    scale_notes = {
+        'c minor': ['C', 'DS', 'G'],
+        'c major': ['C', 'E', 'G'],
+        'c# minor': ['CS', 'E', 'GS'],
+        'c# major': ['CS', 'ES', 'GS'],
+        'd minor': ['D', 'F', 'A'],
+        'd major': ['D', 'FS', 'A'],
+        'd# minor': ['DS', 'FS', 'AS'],
+        'd# major': ['DS', 'G', 'AS'],
+        'e minor': ['E', 'G', 'B'],
+        'e major': ['E', 'GS', 'B'],
+        'f minor': ['F', 'GS', 'C'],
+        'f major': ['F', 'A', 'C'],
+        'f# minor': ['FS', 'A', 'CS'],
+        'f# major': ['FS', 'AS', 'CS'],
+        'g minor': ['G', 'AS', 'D'],
+        'g major': ['G', 'B', 'D'],
+        'g# minor': ['GS', 'B', 'DS'],
+        'g# major': ['GS', 'BS', 'DS'],
+        'a minor': ['A', 'C', 'E'],
+        'a major': ['A', 'CS', 'E'],
+        'a# minor': ['AS', 'CS', 'ES'],
+        'a# major': ['AS', 'CS', 'ES'],
+        'b minor': ['B', 'D', 'FS'],
+        'b major': ['B', 'DS', 'FS'],
+    }
+    return scale_notes.get(scale)
+
+def build_chord(scale, colors):
+    scale_notes = get_scale_notes(scale)
+    chord_progression = []
+    for color in colors:
+        h, s, l = rgb_to_hsl(color)
+        single_chord = None
+        if 0 <= h <= 60 or 300 < h <= 360 or 120 <= h <= 240:
+            if s <= 84:
+                single_chord = scale_notes[0]
+            elif s > 84 and s <= 169:
+                single_chord = scale_notes[1]
+            elif s > 169 and s <= 255:
+                single_chord = scale_notes[2]
+                
+            if l <= 24:
+                single_chord += '_1'
+            elif l > 24 and l <= 50:
+                single_chord += '0'
+            elif l > 50 and l <= 75:
+                single_chord += '1'
+            elif l > 75 and l <= 101:
+                single_chord += '2'
+            elif l > 101 and l <= 126:
+                single_chord += '3'
+            elif l > 126 and l <= 152:
+                single_chord += '4'
+            elif l > 152 and l <= 177:
+                single_chord += '5'
+            elif l > 177 and l <= 203:
+                single_chord += '6'
+            elif l > 203 and l <= 228:
+                single_chord += '7'
+            elif l > 228:
+                single_chord += '8'
+                
+            chord_progression.append(single_chord)
+        else:
+            chord_progression.append('REST')
+        
+        
+        
+    return chord_progression
+    
+
+image_path = os.path.join( 'Barcodes', 'Metroidvanias', 'Metroid Dread.png')
 colors = average_colors_in_segments(image_path)
 print(colors)
-print(get_scale(colors))
+scale = get_scale(colors)
+print(scale)
+chords = build_chord(scale, colors)
+string_chords = ''
+for chord in chords:
+    string_chords += chord + ','
+string_chords = string_chords[:-1]
+print(string_chords)
+f = open("chords.txt", "w")
+f.write(string_chords)
+f.close()
