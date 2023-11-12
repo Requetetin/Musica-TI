@@ -1,6 +1,7 @@
 from PIL import Image
-import webcolors
 import colorsys
+import os
+
 
 def rgb_to_hue(rgb):
     r = rgb[0] / 255
@@ -13,10 +14,13 @@ def rgb_to_hue(rgb):
     return hue
 
 
-def cold_or_warm(rgb_list):
+def get_scale(rgb_list):
     warm_count = 0
     cold_count = 0
     none_count = 0
+
+    notes = [{'c': 0},{'c#': 0},{'d': 0},{'d#': 0},{'e': 0},{'f': 0},{'f#': 0},{'g': 0},{'g#': 0},{'a': 0},{'a#': 0},{'b': 0}]
+
     for rgb in rgb_list:
         
         hue = rgb_to_hue(rgb)
@@ -26,13 +30,41 @@ def cold_or_warm(rgb_list):
         elif 120 <= hue <= 240:
             cold_count += 1
         else:
-            none_count += 1       
+            none_count += 1    
 
-    print(warm_count, cold_count, none_count)
+        if(hue <= 30):
+            notes[0]['c'] += 1
+        elif (hue > 30 and hue <=60):
+            notes[1]['c#'] += 1
+        elif (hue > 60 and hue <=90):
+            notes[2]['d'] += 1
+        elif (hue > 90 and hue <=120):
+            notes[3]['d#'] += 1
+        elif (hue > 120 and hue <=150):
+            notes[4]['e'] += 1
+        elif (hue > 150 and hue <=180):
+            notes[5]['f'] += 1
+        elif (hue > 180 and hue <=210):
+            notes[6]['f#'] += 1
+        elif (hue > 210 and hue <=240):
+            notes[7]['g'] += 1
+        elif (hue > 240 and hue <=270):
+            notes[8]['g#'] += 1
+        elif (hue > 270 and hue <=300):
+            notes[9]['a'] += 1
+        elif (hue > 300 and hue <=330):
+            notes[10]['a#'] += 1
+        elif (hue > 330 and hue <=360):
+            notes[11]['b'] += 1
+        
+        sorted_notes = sorted(notes, key=lambda x: list(x.values())[0], reverse=True)
+        most_common = list(sorted_notes[0].keys())[0]
+
+    print(f'Warm Count: {warm_count}, Cold Count: {cold_count}, None Count: {none_count}')
     if(warm_count > cold_count):
-        return 'warm'
+        return most_common + ' major'
     elif(cold_count > warm_count):
-        return 'cold'
+        return most_common + ' minor'
         
 
 def average_colors_in_segments(image_path):
@@ -68,7 +100,7 @@ def average_colors_in_segments(image_path):
 
     return avg_colors
 
-image_path = "C:\\Users\\Lenovo Y40\\Desktop\\Musica-TI-main\\Barcodes\\Platformers\\Celeste.png"
+image_path = os.path.join( 'Barcodes', 'Platformers', 'Celeste.png')
 colors = average_colors_in_segments(image_path)
 print(colors)
-print(cold_or_warm(colors))
+print(get_scale(colors))
