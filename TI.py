@@ -227,24 +227,37 @@ chord_val = {
   'G9':127,
 }
 
-chords_path = os.path.join('Music', 'Roguelikes', 'Enter the Gungeon.txt')
-f = open(chords_path, "r")
-chords = f.readline()
-f.close()
-chords = chords.split(',')
-
+chords_path = os.path.join('Music', 'Roguelikes', 'Hades.txt')
 pitches = []
-durations = [TN] * len(chords)
-
-for chord in chords:
-   chord_int = chord_val.get(chord)
-   if chord_int:
-      pitches.append(chord_val.get(chord))
-   else:
+durations_path = os.path.join('Music', 'Roguelikes', 'HadesD.txt')
+durations = []
+f = open(chords_path, "r")
+for chord in f:
+   chord_list = chord.split(',')
+   int_chords = []
+   if chord == 'REST\n':
       pitches.append(REST)
+   else:
+      for cd in chord_list:
+         int_chords.append(chord_val.get(cd.replace('\n', '')))
+      pitches.append(int_chords)
+
+f.close()
+
+f = open(durations_path, "r")
+for duration in f:
+   if duration == 'TN\n':
+      durations.append(TN)
+   elif duration == 'SN\n':
+      durations.append(SN)
+   elif duration == 'EN\n':
+      durations.append(EN)
+
+f.close()
       
 theme = Phrase()
 theme.addNoteList(pitches, durations)
 Play.midi(theme)
-      
+
+Write.midi(theme, "Hades.mid")
 

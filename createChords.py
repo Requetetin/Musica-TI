@@ -138,61 +138,110 @@ def get_scale_notes(scale):
     }
     return scale_notes.get(scale)
 
-def build_chord(scale, colors):
-    scale_notes = get_scale_notes(scale)
+def build_chord(colors):
     chord_progression = []
+    durations = []
     for color in colors:
         h, s, l = rgb_to_hsl(color)
-        single_chord = None
+        octave = None
+        base_note = None
         if 0 <= h <= 60 or 300 < h <= 360 or 120 <= h <= 240:
+            if(h <= 30):
+                base_note = 'c'
+            elif (h > 30 and h <=60):
+                base_note = 'c#'
+            elif (h > 60 and h <=90):
+                base_note = 'd'
+            elif (h > 90 and h <=120):
+                base_note = 'd#'
+            elif (h > 120 and h <=150):
+                base_note = 'e'
+            elif (h > 150 and h <=180):
+                base_note = 'f'
+            elif (h > 180 and h <=210):
+                base_note = 'f#'
+            elif (h > 210 and h <=240):
+                base_note = 'g'
+            elif (h > 240 and h <=270):
+                base_note = 'g#'
+            elif (h > 270 and h <=300):
+                base_note = 'a'
+            elif (h > 300 and h <=330):
+                base_note = 'a#'
+            elif (h > 330 and h <=360):
+                base_note = 'b'
+
+            if 0 <= h <= 60 or 300 < h <= 360:
+                base_note += ' major'
+            elif 120 <= h <= 240:
+                base_note += ' minor'
+
+            scale_notes = get_scale_notes(base_note)
+
             if s <= 84:
-                single_chord = scale_notes[0]
+                durations.append('TN')
             elif s > 84 and s <= 169:
-                single_chord = scale_notes[1]
+                durations.append('SN')
             elif s > 169 and s <= 255:
-                single_chord = scale_notes[2]
+                durations.append('EN')
                 
             if l <= 24:
-                single_chord += '_1'
+                octave = '_1'
             elif l > 24 and l <= 50:
-                single_chord += '0'
+                octave = '0'
             elif l > 50 and l <= 75:
-                single_chord += '1'
+                octave = '1'
             elif l > 75 and l <= 101:
-                single_chord += '2'
+                octave = '2'
             elif l > 101 and l <= 126:
-                single_chord += '3'
+                octave = '3'
             elif l > 126 and l <= 152:
-                single_chord += '4'
+                octave = '4'
             elif l > 152 and l <= 177:
-                single_chord += '5'
+                octave = '5'
             elif l > 177 and l <= 203:
-                single_chord += '6'
+                octave = '6'
             elif l > 203 and l <= 228:
-                single_chord += '7'
+                octave = '7'
             elif l > 228:
-                single_chord += '8'
+                octave = '8'
+
+            for i in range(3):
+                scale_notes[i] = scale_notes[i] + octave
                 
-            chord_progression.append(single_chord)
+            chord_progression.append(scale_notes)
         else:
             chord_progression.append('REST')
+            if s <= 84:
+                durations.append('TN')
+            elif s > 84 and s <= 169:
+                durations.append('SN')
+            elif s > 169 and s <= 255:
+                durations.append('EN')
         
         
         
-    return chord_progression
+    return chord_progression, durations
     
 
-image_path = os.path.join( 'Barcodes', 'Metroidvanias', 'Metroid Dread.png')
+image_path = os.path.join( 'Barcodes', 'Roguelikes', 'Hades.png')
 colors = average_colors_in_segments(image_path)
 print(colors)
 scale = get_scale(colors)
 print(scale)
-chords = build_chord(scale, colors)
-string_chords = ''
-for chord in chords:
-    string_chords += chord + ','
-string_chords = string_chords[:-1]
-print(string_chords)
+chords, durations = build_chord(colors)
+print(len(chords), chords)
+print(len(durations), durations)
 f = open("chords.txt", "w")
-f.write(string_chords)
+for chord in chords:
+    str_chord = str(chord)
+    str_chord = str_chord.replace('[', '').replace(']', '').replace(' ', '').replace('\'', '')
+    f.write(str_chord)
+    f.write('\n')
+f.close()
+
+f = open("durations.txt", "w")
+for duration in durations:
+    f.write(str(duration))
+    f.write('\n')
 f.close()
